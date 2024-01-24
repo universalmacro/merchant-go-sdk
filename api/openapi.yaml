@@ -1,0 +1,274 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: chenyunda218@gmail.com
+  description: universalmacro
+  title: Merchant APIs
+  version: 0.0.3
+servers:
+- url: https://uat.api.universalmacro.com/core
+- url: https://api.universalmacro.com/core
+tags:
+- name: Merchant
+paths:
+  /sessions:
+    post:
+      operationId: CreateSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+          description: Success
+      summary: Create session
+      tags:
+      - Session
+  /merchants:
+    post:
+      operationId: CreateMerchant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMerchantRequest'
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+          description: Success
+      security:
+      - ApiKeyAuth: []
+      summary: Create merchant
+      tags:
+      - Merchant
+components:
+  parameters:
+    Ordering:
+      description: ASCENDING or DESCENDING
+      explode: true
+      in: query
+      name: ordering
+      required: false
+      schema:
+        $ref: '#/components/schemas/Ordering'
+      style: form
+    IndexParam:
+      description: Current page index
+      explode: true
+      in: query
+      name: index
+      required: false
+      schema:
+        default: 0
+        minimum: 0
+        type: integer
+      style: form
+    LimitParam:
+      description: Total pages
+      explode: true
+      in: query
+      name: limit
+      required: false
+      schema:
+        default: 1
+        minimum: 1
+        type: integer
+      style: form
+    ID:
+      explode: false
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+      style: simple
+    StartAt:
+      explode: true
+      in: query
+      name: startAt
+      required: false
+      schema:
+        format: int64
+        type: integer
+      style: form
+    EndAt:
+      explode: true
+      in: query
+      name: endAt
+      required: false
+      schema:
+        format: int64
+        type: integer
+      style: form
+  schemas:
+    CreateMerchantRequest:
+      example:
+        shortMerchantId: shortMerchantId
+        password: password
+        account: account
+      properties:
+        shortMerchantId:
+          type: string
+        account:
+          type: string
+        password:
+          type: string
+      required:
+      - account
+      - password
+      - shortMerchantId
+      type: object
+    Merchant:
+      example:
+        shortMerchantId: shortMerchantId
+        createdAt: 0
+        name: name
+        description: description
+        id: id
+        nodeId: nodeId
+        account: account
+        updatedAt: 6
+      properties:
+        id:
+          type: string
+        shortMerchantId:
+          type: string
+        account:
+          type: string
+        nodeId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          format: int64
+          type: integer
+        updatedAt:
+          format: int64
+          type: integer
+      required:
+      - account
+      - createdAt
+      - description
+      - id
+      - name
+      - nodeId
+      - shortMerchantId
+      - updatedAt
+      type: object
+    MerchantList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Merchant'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - items
+      - pagination
+      type: object
+    PhoneNumber:
+      properties:
+        countryCode:
+          type: string
+        number:
+          type: string
+      required:
+      - countryCode
+      - number
+      type: object
+    CreateSessionRequest:
+      description: Login request
+      example:
+        shortMerchantId: shortMerchantId
+        password: password
+        account: account
+      properties:
+        shortMerchantId:
+          type: string
+        account:
+          type: string
+        password:
+          type: string
+      type: object
+    CreateAdminRequest:
+      description: Create admin request schema
+      properties:
+        account:
+          type: string
+        password:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+      required:
+      - account
+      - password
+      type: object
+    Session:
+      example:
+        token: token
+      properties:
+        token:
+          type: string
+      required:
+      - token
+      type: object
+    Role:
+      enum:
+      - ROOT
+      - ADMIN
+      type: string
+    UpdatePasswordRequest:
+      properties:
+        password:
+          type: string
+        oldPassword:
+          type: string
+      required:
+      - password
+      type: object
+    Ordering:
+      description: Ordering
+      enum:
+      - ASCENDING
+      - DESCENDING
+      type: string
+    Pagination:
+      description: Pagination
+      properties:
+        index:
+          description: Current page
+          format: int64
+          type: integer
+        limit:
+          description: Amount per page
+          format: int64
+          type: integer
+        total:
+          description: Total page
+          format: int64
+          type: integer
+      required:
+      - index
+      - limit
+      - total
+      type: object
+  securitySchemes:
+    ApiKeyAuth:
+      in: header
+      name: ApiKey
+      type: apiKey
+    BearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
